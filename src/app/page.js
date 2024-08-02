@@ -13,6 +13,20 @@ export default function Home() {
   const [open, setOpen] = useState(false)
   const [itemName, setItemName] = useState('')
 
+  const searchInventory = async(item) => {
+    const snapshot = query(collection(firestore,'pantry'))
+    const docs = await getDocs(snapshot)
+
+    const inventoryList = docs.docs
+      .filter((doc) => doc.id.toLowerCase() === item.toLowerCase()) 
+      .map((doc) => ({
+        name: doc.id,
+        ...doc.data(),
+    }));
+
+    setInventory(inventoryList)
+  }
+
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'pantry'))
     const docs = await getDocs(snapshot)
@@ -102,17 +116,6 @@ export default function Home() {
     await updateInventory()
   }
 
-  const searchItem = async (item) => {
-    const docRef = doc(collection(firestore, 'pantry'), item)
-    const docSnap = await getDoc(docRef)
-
-    if(docSnap.exists()){
-      const itemData = docSnap.data()
-    }else{
-      //return No results matched your search
-    }
-  }
-
   useEffect(() => {
     updateInventory()
   }, [])
@@ -138,6 +141,7 @@ export default function Home() {
             noWrap
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+            onClick={updateInventory}
           >
             Pantry Tracker
           </Typography>
@@ -148,10 +152,9 @@ export default function Home() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
-              onChange = {(e) => {
+              onKeyDown = {(e) => {
                 if(e.key === "Enter"){
-                  setItemName(e.target.value)
-                  searchItem(itemName)
+                  searchInventory(e.target.value)
                 }
               }}
             />
