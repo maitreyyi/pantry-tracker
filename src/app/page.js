@@ -39,6 +39,7 @@ export default function Home() {
         await setDoc(docRef, {quantity: quantity -1})
       }
     }
+    await updateInventory()
   }
 
   const addItem = async (item) => {
