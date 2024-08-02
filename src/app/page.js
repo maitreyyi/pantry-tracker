@@ -55,7 +55,7 @@ export default function Home() {
   }));
   
   const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
+    color: 'white',
     width: '100%',
     '& .MuiInputBase-input': {
       padding: theme.spacing(1, 1, 1, 0),
@@ -102,13 +102,24 @@ export default function Home() {
     await updateInventory()
   }
 
+  const searchItem = async (item) => {
+    const docRef = doc(collection(firestore, 'pantry'), item)
+    const docSnap = await getDoc(docRef)
+
+    if(docSnap.exists()){
+      const itemData = docSnap.data()
+    }else{
+      //return No results matched your search
+    }
+  }
+
   useEffect(() => {
     updateInventory()
   }, [])
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
-
+ 
   return (
     <Box>
       <AppBar position="static">
@@ -116,7 +127,7 @@ export default function Home() {
           <IconButton
             size="large"
             edge="start"
-            color="inherit"
+            color="white"
             aria-label="open drawer"
             sx={{ mr: 2 }}
           >
@@ -128,7 +139,7 @@ export default function Home() {
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
-            MUI
+            Pantry Tracker
           </Typography>
           <Search>
             <SearchIconWrapper>
@@ -137,6 +148,12 @@ export default function Home() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              onChange = {(e) => {
+                if(e.key === "Enter"){
+                  setItemName(e.target.value)
+                  searchItem(itemName)
+                }
+              }}
             />
           </Search>
         </Toolbar>
